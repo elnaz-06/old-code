@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Weather App</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+  <div class="card">
+    <form>
+    <div class="search">
+      <input type="text" class="searchBox" placeholder="  Search">
+      <button class="icon"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024" height="1.5em"
+        width="1.5em" xmlns="http://www.w3.org/2000/svg">
+        <path
+          d="M909.6 854.5L649.9 594.8C690.2 542.7 712 479 712 412c0-80.2-31.3-155.4-87.9-212.1-56.6-56.7-132-87.9-212.1-87.9s-155.5 31.3-212.1 87.9C143.2 256.5 112 331.8 112 412c0 80.1 31.3 155.5 87.9 212.1C256.5 680.8 331.8 712 412 712c67 0 130.6-21.8 182.7-62l259.7 259.6a8.2 8.2 0 0 0 11.6 0l43.6-43.5a8.2 8.2 0 0 0 0-11.6zM570.4 570.4C528 612.7 471.8 636 412 636s-116-23.3-158.4-65.6C211.3 528 188 471.8 188 412s23.3-116.1 65.6-158.4C296 211.3 352.2 188 412 188s116.1 23.2 158.4 65.6S636 352.2 636 412s-23.3 116.1-65.6 158.4z">
+        </path>
+      </svg>
+      <i type="submit" class="fa-solid fa-magnifying-glass-location submit">
+      </i>
+    </button>
+    </form></div>
+    <div class="location">
+      Tehran
+    </div>
+    <div class="temprature">
+      <span class="number">
+        40
+      </span>
+      <span class="riz"> 
+         <span class="celsius">
+          °C
+        </span>
+      <span>
+        |
+      </span> 
+      <span class="fahrenheit">
+        °F
+      </span>
+    </span>
+    </div>
+    <span class="detail">
+      <div class="weathermoods">
+       Sunny
+    </div>
+    <div class="humidity">
+      Humidity: 
+      <span class="humidityies">
+      40%
+      </span>
+    </div>
+    <div class="wind">
+      Wind speed: 6.2 km/h
+   
+    </div> 
+    </span> 
+    <button class="extra">
+      Current weather
+    </button>
+    <div class="date">
+      Mon, aug 4, 23:55
+    </div>
+    </div>
+  </div>
+<script>
+let searchBoxInput = document.querySelector(".searchBox");
+let locationResult = document.querySelector(".location");
+let form = document.querySelector("form");
+
+form.addEventListener("submit", searchCity);
+
+function searchCity(event) {
+  event.preventDefault();
+  let inputValue = searchBoxInput.value;
+  if (inputValue) {
+    locationResult.textContent = inputValue;
+    showPosition();
+  }
+}
+
+function showPosition() {
+  let apiUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${searchBoxInput.value}&units=metric&appid=5f472b7acba333cd8a035ea85a0d4d4c`;
+  axios.get(apiUrl).then(showWeather);
+}
+
+function showWeather(response) {
+  let lon = response.data[0].lon;
+  let lat = response.data[0].lat;
+  let apiUrlSecond = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=5f472b7acba333cd8a035ea85a0d4d4c`;
+  axios.get(apiUrlSecond).then(applyWeather);
+}
+
+function applyWeather(response) {
+  console.log(response);
+
+  let cityname = response.data.name;
+  let citymainname = document.querySelector(".location");
+
+  let temp = Math.round(response.data.main.temp);
+  let temprach = document.querySelector(".number");
+
+  let weathermood = response.data.weather[0].main;
+  let weathermainmood = document.querySelector(".weathermoods");
+
+  let currenthumidity =  Math.round(response.data.main.humidity);
+  let detailing = document.querySelector(".humidity");
+
+  let speed =  Math.round(response.data.wind.speed);
+  let windspeed = document.querySelector(".wind");
+
+  citymainname.innerHTML = cityname;
+  weathermainmood.innerHTML = weathermood;
+  temprach.innerHTML = temp;
+  detailing.innerHTML = `Humidity: ${currenthumidity}%`;
+  windspeed.innerHTML = `Wind speed: ${speed} km/h`;
+}
+
+function gettinglocation(event) {
+  navigator.geolocation.getCurrentPosition(showWeather);
+}
+
+let button = document.querySelector (".extra");
+
+button.addEventListener("click", gettinglocation)
+
+let now = new Date();
+let days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+let months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+let currentMonth = months[now.getMonth()];
+let currentDay = days[now.getDay()];
+let currentDate = now.getDate();
+let currentHour = ("0" + now.getHours()).slice(-2);
+let currentMinute = ("0" + now.getMinutes()).slice(-2);
+
+let dateElement = document.querySelector(".date");
+dateElement.textContent = `${currentDay}, ${currentMonth} ${currentDate}, ${currentHour}:${currentMinute}`;
+
+  function changer(event) {
+    event.preventDefault();
+    let tempValue = parseFloat(temprach.innerHTML);
+    let fahrenheitValue = (tempValue * 9) / 5 + 32;
+    fahrenheitValue = Math.round(fahrenheitValue);
+    temprach.innerHTML = fahrenheitValue;
+    let details = document.querySelector(".riz");
+    details.innerHTML = "°F | °C";
+  }
+
+let temprach = document.querySelector(".number");
+let farenhite = document.querySelector(".fahrenheit");
+farenhite.addEventListener("click", changer);
+let celci = document.querySelector(".celsius");
+celci.addEventListener("click", rechanger);
+</script>
+    
+</body>
+</html>
